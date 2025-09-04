@@ -1,51 +1,35 @@
-name: Deploy index.html to EC2 Apache Server
+name: Deploy Website
 
 on:
   push:
     branches:
-      - main
+      - main  # or 'master', depending on your default branch
 
 jobs:
   deploy:
+    name: Deploy via SCP
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Copy index.html to EC2 server
+      - name: Upload file to server using SCP
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.ec2-54-166-193-7.compute-1.amazonaws.com }}
-          username: ${{ secrets.ubuntu }}
-          key: ${{ secrets.-----BEGIN RSA PRIVATE KEY-----
-MIIEpgIBAAKCAQEAuSbMCYhGeur0pjVIL3bEu9NQsuxj4VPXw2AxPOeEOUqKvGjs
-Ff+Rnp2l5hmOD5irqfXBkKyIEJyCG1kbzUmeY7snp12YQN1bK/wd+Zlu8Lu08kLw
-drs9LY1VeERAaFvhh17SEpaGX8HqsuY1D0nrl3aNU+zHZIxRgmI6Bh2POkruyikc
-Q0bAXqnjNh00kLdQsWpPJJcGmfiD7hw0fVxSrZ6w7Ou9ihz03+L+GpKR2T2buVgB
-e22H5Uw3VFvASFbIVdb2lVgDPUCkRfaLEJrCQl3Tw+qZwjKhgsn3l+k9ZclaTIaN
-PPQkv2mGvkk91FjY3xkQd+BUV7zSJgMVym+RUwIDAQABAoIBAQCBSA7WZRpZf6++
-UpwJ0FOElwPVO2xujL2uxX77+OiBnIQNFPIsVhyW9Zs+dP+V8lODRH+ZBm+nsbDD
-adAY4tu+5ZLFsXu7ZxTfPJatjy5A18B8HLONJCaOpQ5WAMo8VFPA0zu6EPLY8C1y
-J35LI6FmTDhYro93rObJNM8xL/iviSuReJDlBZReYFZtv/oPRRapvBwx91SNcd4D
-zcQDMjIvyoeapiwTsGrdihAi+VNuUmRP2vYEDOQU1Xu5KFa2vQDAlnLq7tZp4j9M
-JWZrEkFtFD2jNWv4GDDcn/kbPkJqi4BpB21EJUAO1hCPcgyWbgHdjOTWptl1CrhI
-mP6gSZZxAoGBAO99aVTsmdygz3+Jicm1aSioAG0xgiKPITQ6ae+U8yPpnQbYtDwj
-V/d8REYqeaf/9oynV9BUE4sivxJeaWJbxtupcThDQTVdwzsZVp2+X/iQp1gD9+qy
-s1K5TAknpG16HZGr5dJrz4Q0VerbIT+eBKNmgDc04ct4GNehxJUjPeELAoGBAMXq
-aA7qBUE2DbIT2BO9uM5iPxqAcMve5rW3LV9V4O6IO7EQswMSdfv2fLOUaPckidhw
-1WEyhhj3xx1kx8RjdvXHEeHexReXJvBhXosiIFAcnDm07rjabdTa6GitkxKQ/mZ7
-5Y34USPDJbzfvBWu41TUWxjIH4jkF7Sos1aBEs3ZAoGBAKO7tDXRhOfoMbTaTY/Q
-LVMUeSYuQPBrtqHEhgS8avbUkvzJT4AGEfArz2nBRGdtghxrlIfj03C+kq92SMps
-QKqRT8zNflmD/yP6kNNMAsUn8KEmJWsaPauC788agTov0ON1CK0x9DBIr6zfn/2k
-hTtJqsMTroOzWhiiiooEDBw9AoGBALx/5HoH89dHN0YbVlp/AUw4EKgaGtRhyVTb
-UTCS57foMwoSwJy1cX/4JI8ZU9vHhi6KUQDRER0oqRFa0lU+8qdl4adB+G/ee6zI
-4DYd267RgQ4JQLD5AVCQ6ngAkapGRLaxXFKaZhVsoT3Bzi7MsiIyW01AFaDYtadQ
-YfaK2rEJAoGBANJljDOZ1tmChDdbFOM0371kckQ7RFlYo05JKsXYt18+YIaI0ff+
-y3uv1WVrImqrwDE473XInp1rY1qqloKVEt3dvy/nuMehC6ng2Ytek9v/JHFWojBw
-EGH58iB/0tkHS6IPlEAKNvFQXLavf99yo6OV3L7BiBZ2P69trn2Pwj2/
------END RSA PRIVATE KEY-----}}
-          port: 22
-          source: "index.html"
-          target: "${{ secrets./home/ubuntu }}"
-          
+          host: ${{ secrets.HOST }}              # Set in GitHub Secrets
+          username: ${{ secrets.USERNAME }}      # Set in GitHub Secrets
+          key: ${{ secrets.SSH_PRIVATE_KEY }}    # Set in GitHub Secrets (private key content)
+          port: 22                               
+          source: "index.html"                   # Or folder like "dist/"
+          target: "/var/www/html"                # Remote server path
+
+          timeout: 30s
+          command_timeout: 10m
+          use_insecure_cipher: false
+          rm: false
+          debug: false
+          strip_components: 0
+          overwrite: true
+          tar_dereference: false
+          tar_exec: tar
